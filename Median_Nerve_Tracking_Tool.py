@@ -80,7 +80,7 @@ class Application:
         cv2.destroyAllWindows()
         cv2.namedWindow(self.input_file_name)
         self.update_image()
-        cv2.createTrackbar('frame', self.input_file_name, 0, len(self.frames_all)//self.now_Interval, self.Trackbar_Change)
+        cv2.createTrackbar('frame', self.input_file_name, 0, len(self.frames_all)//self.now_Interval -1, self.Trackbar_Change)
         cv2.setMouseCallback(self.input_file_name, self.draw_contour)
         return
 ####################################################################################################
@@ -191,7 +191,7 @@ class Application:
 #        print('Spinbox_Interval_Change')
         self.now_frame = 0
         self.now_Interval = int(self.Spinbox_Interval.get())
-        cv2.createTrackbar('frame', self.input_file_name, 0, len(self.frames_all)//self.now_Interval, self.Trackbar_Change)
+        cv2.createTrackbar('frame', self.input_file_name, 0, len(self.frames_all)//self.now_Interval - 1, self.Trackbar_Change)
         return
 ####################################################################################################
     def Checkbutton_Fine_Tune_Change(self):
@@ -226,7 +226,7 @@ class Application:
             else:
 #                print('self.show_contour == True')
                 contour = self.contour_all[self.now_frame]
-                contour = cv2.erode(contour, np.array([[0,1,0],[1,1,1],[0,1,0]], np.uint8), iterations=2)
+                contour = cv2.erode(contour, np.array([[0,1,0],[1,1,1],[0,1,0]], np.uint8), iterations=1)
                 contour = self.contour_all[self.now_frame]-contour
                 self.image_show[contour>0] = [0,255,255]
         if self.fine_tune:
@@ -294,7 +294,10 @@ class Application:
         elif self.R_button_down:
 #            print('self.R_button_down')
             image_show_temp = np.copy(self.image_show)
-            cv2.rectangle(image_show_temp,(self.ix,self.iy),(x,y),color,1)
+            if self.fine_tune:
+                cv2.rectangle(image_show_temp, (self.ix*2,self.iy*2), (x*2,y*2), color, 1)
+            else:
+                cv2.rectangle(image_show_temp, (self.ix,self.iy), (x,y), color, 1)
             cv2.imshow(self.input_file_name, image_show_temp)
             if event == cv2.EVENT_RBUTTONUP:
 #                print('cv2.EVENT_RBUTTONUP')
